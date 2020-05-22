@@ -12,8 +12,13 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 
 // Routes
-app.use(adminRoutes);
+app.use('/admin', adminRoutes);
 app.use(shopRoutes);
+
+
+app.use((req, res) => {
+    res.status(404).send('<p>Page Not Found!</p>');
+});
 
 // Creates and turns on the server
 app.listen(3000);
