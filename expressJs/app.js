@@ -1,26 +1,19 @@
 // Express
 const express = require('express');
+// Body Parser
 const bodyParser = require('body-parser');
+
+// Routes
+const adminRoutes = require('./routes/admin');
+const shopRoutes = require('./routes/shop');
 
 const app = express();
 
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use('/add-product', (req, res) => {
-    console.log('Add Product middleware!');
-    res.send('<form action="/product" method="POST"><input type="text" name="title" /><button type="submit">Add Product</button></form>');
-});
-
-app.post('/product', (req, res, next) => {
-    console.log('Product middleware!');
-    console.log(req.body);
-    res.redirect('/');
-});
-
-app.use('/', (req, res, next) => {
-    console.log('First middleware!');
-    res.send('<h1>Hello from Express</h1>');
-});
+// Routes
+app.use(adminRoutes);
+app.use(shopRoutes);
 
 // Creates and turns on the server
 app.listen(3000);
