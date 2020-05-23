@@ -16,9 +16,12 @@ const shopRoutes = require('./routes/shop');
 
 const app = express();
 
+// EJS
+app.set('view engine', 'ejs');
+
 // Add Handlebars template engine
-app.engine('handlebars', expressHbs({ layoutsDir: 'views/layouts/', defaultLayout: 'main-layout' }));
-app.set('view engine', 'handlebars');
+// app.engine('handlebars', expressHbs({ layoutsDir: 'views/layouts/', defaultLayout: 'main-layout' }));
+// app.set('view engine', 'handlebars');
 
 // Add pug template engine
 // app.set('view engine', 'pug');
@@ -35,7 +38,7 @@ app.use(shopRoutes);
 
 
 app.use((req, res) => {
-    res.status(404).render('404', { title: 'Page Not Found'});
+    res.status(404).render('404', { title: 'Page Not Found', path: null });
 });
 
 // Creates and turns on the server
