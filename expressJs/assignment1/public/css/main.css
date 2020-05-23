@@ -1,0 +1,29 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+.header {
+
+}
+.nav {
+    display: flex;
+    height: 100%;
+    background-color: #121212;
+}
+.nav-container {
+    display: flex;
+    list-style: none;
+}
+
+.nav-item a {
+    text-decoration: none;
+    color: white;
+    margin: 0 1rem;;
+}
+
+.nav-item a:hover,
+.nav-item a:active,
+.nav-item a.active {
+    color: white;
+    text-decoration: underline;
+}
