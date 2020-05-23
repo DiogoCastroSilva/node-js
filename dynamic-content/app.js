@@ -5,6 +5,8 @@ const path = require('path');
 const express = require('express');
 // Body Parser
 const bodyParser = require('body-parser');
+// Handlebars
+const expressHbs = require('express-handlebars');
 
 // Routes
 const adminData = require('./routes/admin');
@@ -14,8 +16,13 @@ const shopRoutes = require('./routes/shop');
 
 const app = express();
 
-// Add pug template
-app.set('view engine', 'pug');
+// Add Handlebars template engine
+app.engine('handlebars', expressHbs({ layoutsDir: 'views/layouts/', defaultLayout: 'main-layout' }));
+app.set('view engine', 'handlebars');
+
+// Add pug template engine
+// app.set('view engine', 'pug');
+
 // Default behaviour
 app.set('views', 'views');
 
