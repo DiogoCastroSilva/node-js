@@ -1,0 +1,9 @@
+extends layouts/main.pug
+block content
+    h1 Users
+    if users.length > 0
+        .grid
+            each user in users
+                article.item
+                    .item-header
+                        h3 #{user.name}

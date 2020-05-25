@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        title #{title}
+        link(rel="stylesheet", href="./main.css")
+        block styles
+    body
+        header.header
+            nav.navigation
+                ul.navigation-content
+                    li.navigation-item
+                        a(href="/" class=( path === '/' ? 'active' : '' )) Home
+                    li.navigation-item
+                        a(href="/users" class=( path === '/users' ? 'active' : '' )) Users
+        block content
