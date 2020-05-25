@@ -14,15 +14,16 @@ exports.getAddProduct = (req, res) => {
 };
 
 exports.getProducts = (req, res, next) => {
-    const products = Product.fetchAll();
-    res.render('shop', {
-        title: 'Shop',
-        products,
-        docTitle: 'Shop',
-        path: '/',
-        hasProducts: products.length > 0,
-        activeShop: true,
-        productCSS: true
+    Product.fetchAll(products => {
+        res.render('shop', {
+            title: 'Shop',
+            products,
+            docTitle: 'Shop',
+            path: '/',
+            hasProducts: products.length > 0,
+            activeShop: true,
+            productCSS: true
+        });
     });
 };
 
@@ -30,6 +31,5 @@ exports.getProducts = (req, res, next) => {
 exports.postAddProduct = (req, res) => {
     const product = new Product(req.body.title);
     product.save();
-
     res.redirect('/');
 };
