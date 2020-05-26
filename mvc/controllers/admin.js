@@ -1,4 +1,4 @@
-// Products Controller
+// Products Model
 const Product = require('../models/product');
 
 
@@ -15,14 +15,11 @@ exports.getAddProduct = (req, res) => {
 
 exports.getProducts = (req, res, next) => {
     Product.fetchAll(products => {
-        res.render('shop/product-list', {
-            title: 'Shop',
+        res.render('admin/products', {
+            title: 'All Products',
             products,
-            docTitle: 'Shop',
-            path: '/',
-            hasProducts: products.length > 0,
-            activeShop: true,
-            productCSS: true
+            docTitle: 'Admin Products',
+            path: '/admin/products',
         });
     });
 };

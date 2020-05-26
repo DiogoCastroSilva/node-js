@@ -5,15 +5,17 @@ const path = require('path');
 const express = require('express');
 
 // Controllers
-const productsController = require('../controllers/products');
+const adminController = require('../controllers/admin');
 
 const router = express.Router();
 
 // GET
-router.get('/add-product', productsController.getAddProduct);
+router.get('/add-product', adminController.getAddProduct);
+
+router.get('/products');
 
 // POST
-router.post('/add-product', productsController.postAddProduct);
+router.post('/add-product', adminController.postAddProduct);
 
 // Exports
 module.exports = router;
