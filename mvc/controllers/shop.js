@@ -3,7 +3,7 @@ const Product = require('../models/product');
 
 
 // GET
-exports.getProducts = (req, res, next) => {
+exports.getProducts = (req, res) => {
     Product.fetchAll(products => {
         res.render('shop/product-list', {
             title: 'All Products',
@@ -14,7 +14,7 @@ exports.getProducts = (req, res, next) => {
     });
 };
 
-exports.getIndex = (req, res, next) => {
+exports.getIndex = (req, res) => {
     Product.fetchAll(products => {
         res.render('shop/index', {
             title: 'Shop',
@@ -25,7 +25,7 @@ exports.getIndex = (req, res, next) => {
     });
 };
 
-exports.getCart = (req, res, next) => {
+exports.getCart = (req, res) => {
     res.render('shop/cart', {
         title: 'Your Cart',
         docTitle: 'Cart',
@@ -33,7 +33,15 @@ exports.getCart = (req, res, next) => {
     });
 };
 
-exports.getCheckout = (req, res, next) => {
+exports.getOrders = (req, res, next) => {
+    res.render('shop/orders', {
+        title: 'Your Orders',
+        docTitle: 'Orders',
+        path: '/orders'
+    });
+};
+
+exports.getCheckout = (req, res) => {
     res.render('shop/checkout', {
         title: 'Checkout',
         docTitle: 'Checkout',
