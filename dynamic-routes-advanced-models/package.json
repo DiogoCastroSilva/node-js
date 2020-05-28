@@ -1,0 +1,18 @@
+{
+  "name": "dynamic-routes-advanced-models",
+  "version": "1.0.0",
+  "description": "Dynamics Routes and Advanced Models",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app.js"
+  },
+  "author": "Diogo Silva",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "pug": "^3.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
+}
