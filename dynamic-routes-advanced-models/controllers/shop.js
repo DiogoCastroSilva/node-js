@@ -1,5 +1,6 @@
 // Products Model
 const Product = require('../models/product');
+const Cart = require('../models/cart');
 
 
 // GET
@@ -65,5 +66,8 @@ exports.getCheckout = (req, res) => {
 // POST
 exports.addToCart = (req, res) => {
     const id = req.body.id;
+    Product.findById(id, product => {
+        Cart.addProduct(id, product.price);
+    });
     res.redirect('/cart');
 };
