@@ -13,7 +13,7 @@ exports.getAddProduct = (req, res) => {
 
 exports.getEditProduct = (req, res) => {
     const id = req.params.id;
-    Product.findById(id, product => {
+    Product.findByPk(id).then(product => {
         if (!product) {
             res.redirect('/');
         }
@@ -28,7 +28,7 @@ exports.getEditProduct = (req, res) => {
 };
 
 exports.getProducts = (req, res, next) => {
-    Product.fetchAll(products => {
+    Product.findAll().then(products => {
         res.render('admin/products', {
             title: 'All Products',
             products,
@@ -45,27 +45,37 @@ exports.postAddProduct = (req, res) => {
     const description = req.body.description;
     const price = req.body.price;
 
-    const product = new Product(title, imageUrl, description, price);
-    product.save().then(() => {
+    Product.create({
+        title: title,
+        price: price,
+        imageUrl: imageUrl,
+        description: description
+    }).then(result => {
+        console.log('create product', result);
         res.redirect('/');
     });
 };
 
 exports.postEditProduct = (req, res) => {
     const id = req.body.id
-    const title = req.body.title;
-    const imageUrl = req.body.imageUrl;
-    const description = req.body.description;
-    const price = req.body.price;
-    const product = new Product(title, imageUrl, description, price, id);
-
-    product.save();
-    res.redirect('/admin/products');
+    Product.findByPk(id).then(product => {
+        product.title = req.body.title;
+        product.imageUrl = req.body.imageUrl;
+        product.description = req.body.description;
+        product.price = req.body.price;
+        return product.save();
+    }).then(() => {
+        res.redirect('/admin/products');
+    });
+    
 };
 
 // DELETE
 exports.deleteProduct = (req, res) => {
     const id = req.params.id;
-    Product.delete(id);
-    res.redirect('/admin/products');
+    Product.findByPk(id).then(product => {
+        return product.destroy();
+    }).then(() => {
+        res.redirect('/admin/products');
+    });
 };

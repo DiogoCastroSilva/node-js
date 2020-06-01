@@ -1,15 +1,16 @@
-// Products Model
+// Products Model MYSQL Sequelize
 const Product = require('../models/product');
 const Cart = require('../models/cart');
 
 
 // GET
 exports.getProducts = (req, res) => {
-    Product.fetchAll()
-    .then(([rows, fieldData]) => {
+    // MYSQL
+    Product.findAll()
+    .then(products => {
         res.render('shop/product-list', {
             title: 'All Products',
-            products: rows,
+            products,
             docTitle: 'All Products',
             path: '/products',
         });
@@ -20,10 +21,11 @@ exports.getProducts = (req, res) => {
 
 exports.getProduct = (req, res) => {
     const id = req.params.id;
-    Product.findById(id).then(([product]) => {
+    Product.findByPk(id).then(product => {
+        console.log(product);
         res.render('shop/product-detail', {
             title: product.title,
-            product: product[0],
+            product: product,
             docTitle: product.title,
             path: '/product-detail'
         });
@@ -32,10 +34,10 @@ exports.getProduct = (req, res) => {
 };
 
 exports.getIndex = (req, res) => {
-    Product.fetchAll().then(([rows, fieldData]) => {
+    Product.findAll().then(products => {
         res.render('shop/index', {
             title: 'Shop',
-            products: rows,
+            products: products,
             docTitle: 'Shop',
             path: null,
         });

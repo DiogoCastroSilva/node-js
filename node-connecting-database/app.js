@@ -14,7 +14,7 @@ const shopRoutes = require('./routes/shop');
 const errorController = require('./controllers/404');
 
 // Database
-const db = require('./util/database');
+const sequelize = require('./util/database');
 
 
 const app = express();
@@ -23,13 +23,6 @@ const app = express();
 app.set('view engine', 'pug');
 // Default behaviour
 app.set('views', 'views');
-
-// db.execute('SELECT * FROM Products')
-// .then(products => {
-//     console.log(products);
-// }).catch(err => {
-//     console.log(err);
-// });
 
 // Config
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -41,5 +34,11 @@ app.use(shopRoutes);
 // 404 Route
 app.use(errorController.get404Page);
 
-// Creates and turns on the server
-app.listen(3000);
+
+sequelize.sync()
+    .then(result => {
+        // Creates and turns on the server
+        app.listen(3000);
+    }).then(err => {
+        console.log(err);
+    });
