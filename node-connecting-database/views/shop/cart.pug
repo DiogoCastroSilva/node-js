@@ -1,0 +1,14 @@
+extends ../layouts/main-layout.pug
+block styles
+block content
+    main
+        if products.length > 0
+            ul
+                each product in products
+                    li
+                        p #{product.product.title} (#{product.qty})
+                        form(action=`/cart-delete-item` method="POST")
+                            input(type="hidden" name="id" value=product.product.id)
+                            button.btn(type="submit") Delete
+        else
+            h1 No Products in cart
