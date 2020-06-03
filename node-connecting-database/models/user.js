@@ -3,18 +3,20 @@ const { Model, DataTypes } = require('sequelize');
 // Database Connection
 const sequelize = require('../util/database');
 
-class Cart extends Model {}
+class User extends Model {}
 
-Cart.init({
+User.init({
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         allowNull: false,
         primaryKey: true
-    }
-}, {
+    },
+    name: DataTypes.STRING,
+    email: DataTypes.STRING
+},{
     sequelize,
-    modelName: 'cart'
+    modelName: 'user'
 });
 
-module.exports = Cart;
+module.exports = User;
