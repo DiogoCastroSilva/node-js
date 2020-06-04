@@ -13,7 +13,7 @@ exports.getAddProduct = (req, res) => {
 
 exports.getEditProduct = (req, res) => {
     const id = req.params.id;
-    req.user.getProducts({ where: { id }})
+    req.user.getProducts({ where: { id: id } })
         .then(products => {
             const product = products[0];
             if (!product) {
@@ -24,16 +24,16 @@ exports.getEditProduct = (req, res) => {
                 title: 'Edit Product',
                 path: '/admin/edit-product',
                 editing: true,
-                product
+                product: product
             });
         });
 };
 
 exports.getProducts = (req, res) => {
-    Product.getProducts().then(products => {
+    req.user.getProducts().then(products => {
         res.render('admin/products', {
             title: 'All Products',
-            products,
+            products: products,
             docTitle: 'Admin Products',
             path: '/admin/products',
         });
@@ -52,14 +52,6 @@ exports.postAddProduct = (req, res) => {
         price: price,
         imageUrl: imageUrl,
         description: description
-    });
-    
-    Product.create({
-        title: title,
-        price: price,
-        imageUrl: imageUrl,
-        description: description,
-        userId: req.user.id
     }).then(result => {
         console.log('create product', result);
         res.redirect('/');

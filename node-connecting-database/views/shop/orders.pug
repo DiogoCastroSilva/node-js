@@ -1,4 +1,15 @@
 extends ../layouts/main-layout.pug
 block styles
 block content
-    h1 Orders
+    if orders.length > 0
+        h1 Orders
+        ul
+            each order in orders
+                li
+                    h2 #{order.id}
+                    ul
+                        each item in order.products
+                            li #{item.title} (#{item.orderItem.quantity})
+                
+    else
+        h1 Nothing Here!

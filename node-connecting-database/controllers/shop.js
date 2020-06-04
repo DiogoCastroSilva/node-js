@@ -1,7 +1,5 @@
 // Products Model MYSQL Sequelize
 const Product = require('../models/product');
-const Cart = require('../models/cart');
-
 
 // GET
 exports.getProducts = (req, res) => {
@@ -10,7 +8,7 @@ exports.getProducts = (req, res) => {
     .then(products => {
         res.render('shop/product-list', {
             title: 'All Products',
-            products,
+            products: products,
             docTitle: 'All Products',
             path: '/products',
         });
@@ -61,11 +59,15 @@ exports.getCart = (req, res) => {
 };
 
 exports.getOrders = (req, res, next) => {
-    res.render('shop/orders', {
-        title: 'Your Orders',
-        docTitle: 'Orders',
-        path: '/orders'
+    req.user.getOrders({ include: ['products'] }).then(orders => {
+        res.render('shop/orders', {
+            title: 'Your Orders',
+            docTitle: 'Orders',
+            path: '/orders',
+            orders: orders
+        });
     });
+    
 };
 
 exports.getCheckout = (req, res) => {
@@ -80,25 +82,26 @@ exports.getCheckout = (req, res) => {
 exports.addToCart = (req, res) => {
     const id = req.body.id;
     let fetchedCart;
+    let newQuantity = 1;
     req.user
         .getCart().then(cart => {
             fetchedCart = cart;
-            return cart.getProducts({ where: { id } } );
+            return cart.getProducts({ where: { id: id } } );
         }).then(products => {
             let product;
             if (products.lenght > 0) {
-                product = product[0];
+                product = products[0];
             }
-            let newQuantity = 1;
             if (product) {
-
+                const oldQuantity = product.cartItem.quantity;
+                newQuantity = oldQuantity + 1;
+                return product;
             }
-            return Product.findByPk(id)
-                .then(product => {
-                    return fetchedCart.addProduct(product, {
-                        trough: { quantity: newQuantity }
-                    });
-                });
+            return Product.findByPk(id);
+        }).then(product => {
+            return fetchedCart.addProduct(product, {
+                through: { quantity: newQuantity }
+            });
         }).then(() => {
             res.redirect('/cart');
         });
@@ -106,8 +109,33 @@ exports.addToCart = (req, res) => {
 
 exports.postDeleteProduct = (req, res) => {
     const id = req.body.id;
-    Product.findById(id, product => {
-        Cart.removeProduct(id, product.price);
+    req.user.getCart().then(cart => {
+        return cart.getProducts({ where: { id: id } } );
+    }).then(products => {
+        const product = products[0];
+        product.cartItem.destroy();
+    }).then(() => {
         res.redirect('/cart');
+    });
+};
+
+exports.addOrder = (req, res) => {
+    let fetchedCart;
+    req.user.getCart().then(cart => {
+        fetchedCart = cart;
+        return cart.getProducts();
+    }).then(products => {
+        return req.user.createOrder()
+            .then(order => {
+                return order.addProducts(products.map(product => {
+                    product.orderItem = { quantity: productd.cartItem.quantity };
+                    return product;
+                }));
+            });
+    }).then(() => {
+        return fetchedCart.setProducts(null);
+        
+    }).then(() => {
+        res.redirect('/orders');
     });
 };
