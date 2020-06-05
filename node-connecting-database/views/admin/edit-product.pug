@@ -20,7 +20,7 @@ block content
             else
                 textarea(type="text" name="description" rows="5")#description
             if editing
-                input(type="hidden" name="id" value=product.id)
+                input(type="hidden" name="id" value=product._id)
                 button.btn(type="submit") Edit Product
             else
                 button.btn(type="submit") Add Product

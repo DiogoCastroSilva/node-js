@@ -15,15 +15,10 @@ const errorController = require('./controllers/404');
 
 // Models
 const User = require('./models/user');
-const Product = require('./models/product');
-const Cart = require('./models/cart');
-const CartItem = require('./models/cart-item');
-const Order = require('./models/order');
-const OrderItem = require('./models/order-item');
 
 // Database
-const sequelize = require('./util/database');
-
+// const sequelize = require('./util/database');
+const mongoConnect = require('./util/database').mongoDBConnect;
 
 const app = express();
 
@@ -37,9 +32,11 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use((req, res, next) => {
-    User.findByPk(1).then(user => {
-        req.user = user;
+    User.getUser('5ed9747d7f2b56de5efca8a4').then(user => {
+        req.user = new User(user.name, user.email, user.cart, user._id);
         next();
+    }).catch(e => {
+        console.log('Error geting user on start app' ,e);
     });
 });
 
@@ -49,39 +46,45 @@ app.use(shopRoutes);
 // 404 Route
 app.use(errorController.get404Page);
 
+// Sequelize Relations
 // Data Associations
-Product.belongsTo(User, {
-    constraints: true,
-    onDelete: 'CASCADE'
-});
-User.hasMany(Product);
-User.hasOne(Cart);
-Cart.belongsTo(User);
-Cart.belongsToMany(Product, { through: CartItem });
-Product.belongsToMany(Cart, { through: CartItem });
-Order.belongsTo(User);
-User.hasMany(Order);
-Order.belongsToMany(Product, { through: OrderItem });
+// Product.belongsTo(User, {
+//     constraints: true,
+//     onDelete: 'CASCADE'
+// });
+// User.hasMany(Product);
+// User.hasOne(Cart);
+// Cart.belongsTo(User);
+// Cart.belongsToMany(Product, { through: CartItem });
+// Product.belongsToMany(Cart, { through: CartItem });
+// Order.belongsTo(User);
+// User.hasMany(Order);
+// Order.belongsToMany(Product, { through: OrderItem });
 
-sequelize
-    //.sync({ force: true })
-    .sync()
-    .then(result => {
-        return User.findByPk(1);
-    })
-    .then(user => {
-        if (!user) {
-            User.create({ name: 'Max', email: 'max@max.com' });
-        }
-        return user;
-    })
-    .then(user => {
-        return user.createCart(); 
-    })
-    .then(cart => {
-        // Creates and turns on the server
-        app.listen(3000);
-    })
-    .catch(err => {
-        console.log(err);
-    });
+// Sequelize Connection
+// sequelize
+//     //.sync({ force: true })
+//     .sync()
+//     .then(result => {
+//         return User.findByPk(1);
+//     })
+//     .then(user => {
+//         if (!user) {
+//             User.create({ name: 'Max', email: 'max@max.com' });
+//         }
+//         return user;
+//     })
+//     .then(user => {
+//         return user.createCart(); 
+//     })
+//     .then(cart => {
+//         // Creates and turns on the server
+//         app.listen(3000);
+//     })
+//     .catch(err => {
+//         console.log(err);
+//     });
+
+mongoConnect(() => {
+    app.listen(3000);
+});
