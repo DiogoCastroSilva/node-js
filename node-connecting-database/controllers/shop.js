@@ -191,12 +191,16 @@ exports.getCart = (req, res) => {
     });
 };
 
-exports.getOrders = (req, res, next) => {
-    res.render('shop/orders', {
-        title: 'Your Orders',
-        docTitle: 'Orders',
-        path: '/orders'
-    });
+exports.getOrders = (req, res) => {
+    req.user.getOrders()
+        .then(orders => {
+            res.render('shop/orders', {
+                title: 'Your Orders',
+                docTitle: 'Orders',
+                path: '/orders',
+                orders: orders
+            });
+        });
 };
 
 exports.getCheckout = (req, res) => {
@@ -227,5 +231,7 @@ exports.postDeleteProduct = (req, res) => {
 };
 
 exports.addOrder = (req, res) => {
-
+    req.user.addOrder().then(result => {
+        res.redirect('/orders');
+    });
 };
