@@ -12,6 +12,7 @@ exports.getProducts = (req, res) => {
             products: products,
             docTitle: 'All Products',
             path: '/products',
+            isAuthenticated: req.isLogin
         });
     });
 };
@@ -23,7 +24,8 @@ exports.getProduct = (req, res) => {
             title: product.title,
             docTitle: product.title,
             path: '/product-detail',
-            product: product
+            product: product,
+            isAuthenticated: req.isLogin
         });
     });
 };
@@ -35,6 +37,7 @@ exports.getIndex = (req, res) => {
             docTitle: 'Shop',
             products: products,
             path: null,
+            isAuthenticated: req.isLogin
         });
     });
 };
@@ -48,7 +51,8 @@ exports.getCart = (req, res) => {
                 title: 'Your Cart',
                 docTitle: 'Cart',
                 path: '/cart',
-                products: user.cart.items
+                products: user.cart.items,
+                isAuthenticated: req.isLogin
             });
         });
 };
@@ -60,7 +64,8 @@ exports.getOrders = (req, res) => {
                 title: 'Your Orders',
                 docTitle: 'Orders',
                 path: '/orders',
-                orders: orders
+                orders: orders,
+                isAuthenticated: req.isLogin
             });
         });
 };
@@ -69,7 +74,8 @@ exports.getCheckout = (req, res) => {
     res.render('shop/checkout', {
         title: 'Checkout',
         docTitle: 'Checkout',
-        path: '/checkout'
+        path: '/checkout',
+        isAuthenticated: req.isLogin
     });
 };
 

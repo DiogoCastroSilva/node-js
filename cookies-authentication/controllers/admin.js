@@ -8,7 +8,8 @@ exports.getAddProduct = (req, res) => {
     res.render('admin/edit-product', {
         title: 'Add Product',
         path: '/admin/add-product',
-        editing: false
+        editing: false,
+        isAuthenticated: req.isLogin
     });
 };
 
@@ -20,7 +21,8 @@ exports.getEditProduct = (req, res) => {
             title: 'Edit Product',
             path: '/admin/edit-product',
             editing: true,
-            product: product
+            product: product,
+            isAuthenticated: req.isLogin
         });
     });
 };
@@ -31,7 +33,8 @@ exports.getProducts = (req, res) => {
             title: 'All Products',
             docTitle: 'Admin Products',
             path: '/admin/products',
-            products: products
+            products: products,
+            isAuthenticated: req.isLogin
         });
     });
 };

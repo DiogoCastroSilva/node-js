@@ -1,5 +1,3 @@
-// Path
-const path = require('path');
 // Express
 const express = require('express');
 
