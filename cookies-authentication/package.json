@@ -1,0 +1,25 @@
+{
+  "name": "cookies-authentication",
+  "version": "1.0.0",
+  "description": "Node js project with cookies and authentication",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app.js"
+  },
+  "keywords": [
+    "cookies",
+    "authentication",
+    "node"
+  ],
+  "author": "Diogo Silva",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongodb": "^3.5.8",
+    "mongoose": "^5.9.18",
+    "pug": "^3.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
+}
