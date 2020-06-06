@@ -147,7 +147,7 @@ const Product = require('../models/product');
 // // GET
 exports.getProducts = (req, res) => {
     // MYSQL
-    Product.fetchAll().then(products => {
+    Product.find().then(products => {
         res.render('shop/product-list', {
             title: 'All Products',
             products: products,
@@ -159,7 +159,7 @@ exports.getProducts = (req, res) => {
 
 exports.getProduct = (req, res) => {
     const id = req.params.id;
-    Product.getProduct(id).then(product => {
+    Product.findById(id).then(product => {
         res.render('shop/product-detail', {
             title: product.title,
             docTitle: product.title,
@@ -170,7 +170,7 @@ exports.getProduct = (req, res) => {
 };
 
 exports.getIndex = (req, res) => {
-    Product.fetchAll().then(products => {
+    Product.find().then(products => {
         res.render('shop/index', {
             title: 'Shop',
             docTitle: 'Shop',
@@ -214,7 +214,7 @@ exports.getCheckout = (req, res) => {
 // POST
 exports.addToCart = (req, res) => {
     const id = req.body.id;
-    Product.getProduct(id).then(product => {
+    Product.findById(id).then(product => {
         return req.user.addToCart(product);
     }).then(result => {
         console.log('Add to cart', result);

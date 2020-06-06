@@ -6,6 +6,9 @@ const express = require('express');
 // Body Parser
 const bodyParser = require('body-parser');
 
+// Mongoose
+const mongoose = require('mongoose');
+
 // Routes
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
@@ -18,7 +21,7 @@ const User = require('./models/user');
 
 // Database
 // const sequelize = require('./util/database');
-const mongoConnect = require('./util/database').mongoDBConnect;
+// const mongoConnect = require('./util/database').mongoDBConnect;
 
 const app = express();
 
@@ -85,6 +88,16 @@ app.use(errorController.get404Page);
 //         console.log(err);
 //     });
 
-mongoConnect(() => {
-    app.listen(3000);
-});
+// MongoDB
+// mongoConnect(() => {
+//     app.listen(3000);
+// });
+
+// Mongoose
+mongoose
+    .connect('mongodb+srv://Diogo:asdzxc@cluster0-fnsz5.mongodb.net/shop?retryWrites=true&w=majority')
+    .then(() => {
+        app.listen(3000);
+    }).catch(e => {
+        console.log('Erro connecting to server', e);
+    });

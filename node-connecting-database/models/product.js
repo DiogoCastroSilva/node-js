@@ -69,67 +69,93 @@
 // module.exports = Product;
 
 // MONGO DB
-const { ObjectId } = require('mongodb');
-const getDB = require('../util/database').getDB;
+// const { ObjectId } = require('mongodb');
+// const getDB = require('../util/database').getDB;
 
-class Product {
-    constructor(title, imageUrl, description, price, id, userId) {
-        this.title = title;
-        this.imageUrl = imageUrl;
-        this.description = description;
-        this.price = price;
-        this._id = id ? new ObjectId(id) : undefined;
-        this.userId = userId;
+// class Product {
+//     constructor(title, imageUrl, description, price, id, userId) {
+//         this.title = title;
+//         this.imageUrl = imageUrl;
+//         this.description = description;
+//         this.price = price;
+//         this._id = id ? new ObjectId(id) : undefined;
+//         this.userId = userId;
+//     }
+
+//     async save() {
+//         const db = getDB();
+//         let dbOp;
+//         if (this._id) {
+//             // Update product
+//             dbOp = db.collection('products').updateOne({
+//                 _id: this._id }, { $set: this }
+//             );
+//         } else {
+//             dbOp = db.collection('products').insertOne(this);
+//         }
+
+//         try {
+//             let result = await dbOp;
+//             console.log('results', result);
+//             return result;
+//         } catch(e) {
+//             console.log('error', e);
+//             return e;
+//         }
+//     }
+
+//     static async fetchAll() {
+//         const db = getDB();
+//         try {
+//             return await db.collection('products').find().toArray();
+//         } catch(e) {
+//             console.log('Error fetching products', e);
+//         }
+//     }
+
+//     static async getProduct(id) {
+//         const db = getDB();
+//         try {
+//             return await db.collection('products').findOne({ _id: new ObjectId(id) });
+//         } catch(e) {
+//             console.log('Error fetching product', e);
+//         }
+//     }
+
+//     static async delete(id) {
+//         const db = getDB();
+//         try {
+//             return await db.collection('products').deleteOne({ _id: new ObjectId(id) });
+//         } catch(e) {
+//             console.log('Erro deleting product', e);
+//         }
+//     }
+// }
+
+// module.exports = Product;
+
+// Mongoose
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+
+
+const productSchema = new Schema({
+    title: {
+        type: String,
+        required: true
+    },
+    price: {
+        type: Number,
+        required: true
+    },
+    description: {
+        type: String,
+        required: true
+    },
+    imageUrl: {
+        type: String,
+        required: true
     }
+});
 
-    async save() {
-        const db = getDB();
-        let dbOp;
-        if (this._id) {
-            // Update product
-            dbOp = db.collection('products').updateOne({
-                _id: this._id }, { $set: this }
-            );
-        } else {
-            dbOp = db.collection('products').insertOne(this);
-        }
-
-        try {
-            let result = await dbOp;
-            console.log('results', result);
-            return result;
-        } catch(e) {
-            console.log('error', e);
-            return e;
-        }
-    }
-
-    static async fetchAll() {
-        const db = getDB();
-        try {
-            return await db.collection('products').find().toArray();
-        } catch(e) {
-            console.log('Error fetching products', e);
-        }
-    }
-
-    static async getProduct(id) {
-        const db = getDB();
-        try {
-            return await db.collection('products').findOne({ _id: new ObjectId(id) });
-        } catch(e) {
-            console.log('Error fetching product', e);
-        }
-    }
-
-    static async delete(id) {
-        const db = getDB();
-        try {
-            return await db.collection('products').deleteOne({ _id: new ObjectId(id) });
-        } catch(e) {
-            console.log('Erro deleting product', e);
-        }
-    }
-}
-
-module.exports = Product;
+module.exports = mongoose.model('Product', productSchema);
