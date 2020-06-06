@@ -34,13 +34,23 @@ app.set('views', 'views');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+// app.use((req, res, next) => {
+//     User.getUser('5edb711b2f71cd16b95bceb2').then(user => {
+//         req.user = new User(user.name, user.email, user.cart, user._id);
+//         next();
+//     }).catch(e => {
+//         console.log('Error geting user on start app' ,e);
+//     });
+// });
+
 app.use((req, res, next) => {
-    User.getUser('5ed9747d7f2b56de5efca8a4').then(user => {
-        req.user = new User(user.name, user.email, user.cart, user._id);
-        next();
-    }).catch(e => {
-        console.log('Error geting user on start app' ,e);
-    });
+    User.findById('5edb711b2f71cd16b95bceb2')
+        .then(user => {
+            req.user = user;
+            next();
+        }).catch(e => {
+            console.log('Error geting user on start app' ,e);
+        });
 });
 
 // Routes
@@ -97,6 +107,19 @@ app.use(errorController.get404Page);
 mongoose
     .connect('mongodb+srv://Diogo:asdzxc@cluster0-fnsz5.mongodb.net/shop?retryWrites=true&w=majority')
     .then(() => {
+        User.findOne().then(user => {
+            if (!user) {
+                const user = new User({
+                    name: 'Diogo',
+                    email: 'diogo@diogo.com',
+                    cart: {
+                        items: []
+                    }
+                });
+                user.save();
+            }
+        });
+        
         app.listen(3000);
     }).catch(e => {
         console.log('Erro connecting to server', e);

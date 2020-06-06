@@ -7,10 +7,10 @@ block content
             ul.cart__item-list
                 each product in products
                     li.cart__item
-                        h1 #{product.title}
+                        h1 #{product.productId.title}
                         h2 Quantity: #{product.quantity}
                         form(action=`/cart-delete-item` method="POST")
-                            input(type="hidden" name="id" value=product._id)
+                            input(type="hidden" name="id" value=product.productId._id)
                             button.btn.danger(type="submit") Delete
             .centered
                 form(action="/create-order" method="POST")
