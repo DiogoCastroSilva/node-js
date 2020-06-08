@@ -4,7 +4,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 // Session
 const session = require('express-session');
-var MongoDBStore = require('connect-mongodb-session')(session);
+const MongoDBStore = require('connect-mongodb-session')(session);
+const csrf = require('csurf');
+const flash = require('connect-flash');
 
 const MONGODB_URI = 'mongodb+srv://Diogo:asdzxc@cluster0-fnsz5.mongodb.net/shop?retryWrites=true&w=majority';
 // Mongoose
@@ -28,6 +30,8 @@ const store = new MongoDBStore({
     collection: 'sessions'
 });
 
+const csrfProtection = csrf();
+
 // Add pug template engine
 app.set('view engine', 'pug');
 // Default behaviour
@@ -39,6 +43,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(
     session({ secret: 'my secret', resave: false, saveUninitialized: false, store: store })
 );
+app.use(csrfProtection);
+app.use(flash());
 
 app.use((req, res, next) => {
     if (!req.session.user) {
@@ -51,6 +57,12 @@ app.use((req, res, next) => {
         }).catch(e => {
             console.log('Error geting user on start app' ,e);
         });
+});
+
+app.use((req, res, next) => {
+    res.locals.isAuthenticated = req.session.isLoggedIn;
+    res.locals.csrfToken = req.csrfToken();
+    next();
 });
 
 // Routes

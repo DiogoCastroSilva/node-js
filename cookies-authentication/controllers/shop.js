@@ -11,8 +11,7 @@ exports.getProducts = (req, res) => {
             title: 'All Products',
             products: products,
             docTitle: 'All Products',
-            path: '/products',
-            isAuthenticated: req.session.isLoggedIn
+            path: '/products'
         });
     });
 };
@@ -24,8 +23,7 @@ exports.getProduct = (req, res) => {
             title: product.title,
             docTitle: product.title,
             path: '/product-detail',
-            product: product,
-            isAuthenticated: req.session.isLoggedIn
+            product: product
         });
     });
 };
@@ -36,8 +34,9 @@ exports.getIndex = (req, res) => {
             title: 'Shop',
             docTitle: 'Shop',
             products: products,
-            path: null,
-            isAuthenticated: req.session.isLoggedIn
+            path: null
+            // isAuthenticated: req.session.isLoggedIn,
+            // csrfToken: req.csrfToken()
         });
     });
 };
@@ -51,8 +50,7 @@ exports.getCart = (req, res) => {
                 title: 'Your Cart',
                 docTitle: 'Cart',
                 path: '/cart',
-                products: user.cart.items,
-                isAuthenticated: req.session.isLoggedIn
+                products: user.cart.items
             });
         });
 };
@@ -64,8 +62,7 @@ exports.getOrders = (req, res) => {
                 title: 'Your Orders',
                 docTitle: 'Orders',
                 path: '/orders',
-                orders: orders,
-                isAuthenticated: req.session.isLoggedIn
+                orders: orders
             });
         });
 };
@@ -74,8 +71,7 @@ exports.getCheckout = (req, res) => {
     res.render('shop/checkout', {
         title: 'Checkout',
         docTitle: 'Checkout',
-        path: '/checkout',
-        isAuthenticated: req.session.isLoggedIn
+        path: '/checkout'
     });
 };
 
@@ -111,7 +107,7 @@ exports.addOrder = (req, res) => {
             }));
             const order = new Order({
                 user: {
-                    name: req.user.name,
+                    email: req.user.email,
                     userId: req.user._id
                 },
                 products: products

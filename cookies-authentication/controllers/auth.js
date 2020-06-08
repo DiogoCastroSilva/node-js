@@ -11,20 +11,34 @@ exports.getLogin = (req, res) => {
     //     .split(';')[1]
     //     .trim()
     //     .split('=')[1];
+
+    let messages = req.flash('error');
+    if (messages.length > 0) {
+        messages = messages[0];
+    } else {
+        messages = null;
+    }
     res.render('auth/login', {
         path: '/login',
         title: 'Login',
         docTitle: 'Login',
-        isAuthenticated: false
+        errorMessage: messages
     });
 };
 
 exports.getSignup = (req, res) => {
+    let messages = req.flash('error');
+    if (messages.length > 0) {
+        messages = messages[0];
+    } else {
+        messages = null;
+    }
+
     res.render('auth/signup', {
         path: '/signup',
         title: 'Signup',
         docTitle: 'Signup',
-        isAuthenticated: false
+        errorMessage: messages
     });
 };
 
@@ -32,10 +46,14 @@ exports.getSignup = (req, res) => {
 exports.postLogin = (req, res) => {
     // Cookie
     // req.setHeader('Set-Cookie', 'isLogedIn=true');
-    if (!req.body.email) return;
+    if (!req.body.email) {
+        req.flash('error', 'Fields missing');
+        return res.redirect('/login');
+    };
     User.findOne({ email: req.body.email })
         .then(user => {
             if (!user) {
+                req.flash('error', 'Invalid email');
                 return res.redirect('/login');
             }
             bcrypt.compare(req.body.password, user.password)
@@ -49,12 +67,13 @@ exports.postLogin = (req, res) => {
                             res.redirect('/');
                         });
                     }
+                    req.flash('error', 'Invalid password');
                     res.redirect('/login');
                 })
                 .catch(e => {
                     console.log('Error comparing password', e);
                 });
-        });
+        })
 };
 
 exports.postLogout = (req, res) => {
@@ -71,6 +90,7 @@ exports.postSignup = (req, res) => {
     User.findOne({email: email})
         .then(user => {
             if (user) {
+                req.flash('error', 'Email alredy exists, login or pick a new one');
                 return res.redirect('/signup');
             }
 

@@ -15,6 +15,7 @@ block content
             input(type="number" name="price" step="0.01" value=editing ? product.price : '')#price
         .form-control
             label(for="description") Description
+            input(type="hidden" name="_csrf" value=csrfToken)
             if editing
                 textarea(type="text" name="description" rows="5")#description #{product.description}
             else
