@@ -1,11 +1,12 @@
-// Path
+// Core
 const path = require('path');
-
-// Express
 const express = require('express');
-// Body Parser
 const bodyParser = require('body-parser');
+// Session
+const session = require('express-session');
+var MongoDBStore = require('connect-mongodb-session')(session);
 
+const MONGODB_URI = 'mongodb+srv://Diogo:asdzxc@cluster0-fnsz5.mongodb.net/shop?retryWrites=true&w=majority';
 // Mongoose
 const mongoose = require('mongoose');
 
@@ -22,6 +23,10 @@ const User = require('./models/user');
 
 
 const app = express();
+const store = new MongoDBStore({
+    uri: MONGODB_URI,
+    collection: 'sessions'
+});
 
 // Add pug template engine
 app.set('view engine', 'pug');
@@ -31,9 +36,15 @@ app.set('views', 'views');
 // Config
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(
+    session({ secret: 'my secret', resave: false, saveUninitialized: false, store: store })
+);
 
 app.use((req, res, next) => {
-    User.findById('5edb711b2f71cd16b95bceb2')
+    if (!req.session.user) {
+        return next();
+    }
+    User.findById(req.session.user._id)
         .then(user => {
             req.user = user;
             next();
@@ -51,21 +62,8 @@ app.use(errorController.get404Page);
 
 // Mongoose
 mongoose
-    .connect('mongodb+srv://Diogo:asdzxc@cluster0-fnsz5.mongodb.net/shop?retryWrites=true&w=majority')
-    .then(() => {
-        User.findOne().then(user => {
-            if (!user) {
-                const user = new User({
-                    name: 'Diogo',
-                    email: 'diogo@diogo.com',
-                    cart: {
-                        items: []
-                    }
-                });
-                user.save();
-            }
-        });
-        
+    .connect(MONGODB_URI)
+    .then(() => {   
         app.listen(3000);
     }).catch(e => {
         console.log('Erro connecting to server', e);
