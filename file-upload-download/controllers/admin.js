@@ -1,6 +1,9 @@
 // Validator
 const { validationResult } = require('express-validator');
 
+// Utils
+const fileUtil = require('../util/file');
+
 // Product Model
 const Product = require('../models/product');
 
@@ -170,6 +173,7 @@ exports.postEditProduct = (req, res, next) => {
 
         // Only save image if the value was changed
         if (image) {
+            fileUtil.deleteFile(product.imageUrl);
             product.imageUrl = image.path;
         }
 
@@ -189,14 +193,20 @@ exports.postEditProduct = (req, res, next) => {
 // // DELETE
 exports.deleteProduct = (req, res, next) => {
     const id = req.params.id;
-    Product
-        .deleteOne({ _id: id, userId: req.user._id })
-        .then(() => {
-            res.redirect('/admin/products');
-        })
-        .catch(e => {
-            const error = new Error('Deleting Product error: ' + e);
-            error.httpStatusCode = 500;
-            return next(error);
-        });
+    Product.findById(id).then(product => {
+        if (!product) {
+            return next(new Error('Product not found!'));
+        }
+        fileUtil.deleteFile(product.imageUrl);
+        return Product
+                    .deleteOne({ _id: id, userId: req.user._id });
+    })
+    .then(() => {
+        res.redirect('/admin/products');
+    })
+    .catch(e => {
+        const error = new Error('Deleting Product error: ' + e);
+        error.httpStatusCode = 500;
+        return next(error);
+    });
 };

@@ -1,6 +1,7 @@
 // Core
 const fs = require('fs');
 const path = require('path');
+const express = require('express');
 
 // PDF Kit
 const PDFDocument = require('pdfkit');
@@ -8,6 +9,9 @@ const PDFDocument = require('pdfkit');
 // Models
 const Product = require('../models/product');
 const Order = require('../models/order');
+
+// Util
+const pdfUtil = require('../util/pdf');
 
 
 // Mongoose
@@ -133,7 +137,11 @@ exports.getInvoice = (req, res, next) => {
             const pdfDoc = new PDFDocument();
             pdfDoc.pipe(fs.createWriteStream(invoicePath));
             pdfDoc.pipe(res);
-            pdfDoc.text('Hello world');
+            
+            pdfUtil.generateHeader(pdfDoc);
+            pdfUtil.generateUserData(pdfDoc, req.user.email);
+            pdfUtil.generateTable(pdfDoc, order.products);
+
             pdfDoc.end();
 
 
