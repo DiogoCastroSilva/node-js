@@ -1,0 +1,53 @@
+extends ../layouts/main-layout.pug
+block styles
+    link(rel="stylesheet", href="/css/product.css")
+    link(rel="stylesheet", href="/css/forms.css")
+block content
+    if errorMessage
+            .user-message.user-message--error #{ errorMessage }
+    form.product-form(
+        action=editing ? "/admin/edit-product" : "/admin/add-product"
+        method="POST"
+        enctype="multipart/form-data"
+    )
+        .form-control
+            label(for="title") Title
+            input(
+                type="text"
+                name="title"
+                value=editing || hasError ? product.title : ''
+                class=errors && errors.length > 0 && errors.find(e => e.param === 'title') ? 'invalid' : ''
+            )#title
+        .form-control
+            label(for="image") Image
+            input(
+                type="file"
+                name="image"
+                class=errors && errors.length > 0 && errors.find(e => e.param === 'image') ? 'invalid' : ''
+            )#image
+        .form-control
+            label(for="price") Price
+            input(
+                type="number"
+                name="price"
+                step="0.01"
+                value=editing || hasError ? product.price : ''
+                class=errors && errors.length > 0 && errors.find(e => e.param === 'price') ? 'invalid' : ''
+            )#price
+        .form-control
+            label(for="description") Description
+            input(type="hidden" name="_csrf" value=csrfToken)
+            if editing || hasError
+                textarea(
+                    type="text"
+                    name="description"
+                    rows="5"
+                    class=errors && errors.length > 0 && errors.find(e => e.param === 'description') ? 'invalid' : ''
+                )#description #{product.description}
+            else
+                textarea(type="text" name="description" rows="5")#description
+            if editing
+                input(type="hidden" name="id" value=product._id)
+                button.btn(type="submit") Edit Product
+            else
+                button.btn(type="submit") Add Product
