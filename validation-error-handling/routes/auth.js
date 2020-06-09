@@ -20,9 +20,15 @@ router.get('/new-password/:token', authController.getNewPassword);
 router.post(
     '/login',
     [
-        body('email').isEmail().withMessage('Please enter a valid email'),
-        body('password').isAlphanumeric().isLength({ min: 5 })
-            .withMessage('Enter a valid password that is 5 characters long and as numbers and text'),
+        body('email')
+            .isEmail()
+            .withMessage('Please enter a valid email')
+            .normalizeEmail(),
+        body('password')
+            .isAlphanumeric()
+            .isLength({ min: 5 })
+            .withMessage('Enter a valid password that is 5 characters long and as numbers and text')
+            .trim(),
     ],
     authController.postLogin
 );
@@ -33,6 +39,7 @@ router.post(
         check('email')
             .isEmail()
             .withMessage('Please enter a valid email')
+            .normalizeEmail()
             .custom((value, {req}) => {
                 // Exemple of a custom validation
                 // if (value === 'test@test.com') {
@@ -51,8 +58,10 @@ router.post(
             'Please enter a valid password, with at least 5 characters, with numbers and text!'
         )
             .isLength({ min: 5 })
-            .isAlphanumeric(),
+            .isAlphanumeric()
+            .trim(),
         body('confirmPassword')
+            .trim()
             .custom((value, {req}) => {
                 if (value !== req.body.password) {
                     throw new Error('Passwords have to match!');

@@ -54,7 +54,8 @@ exports.getSignup = (req, res) => {
         path: '/signup',
         title: 'Signup',
         docTitle: 'Signup',
-        errorMessage: messages
+        errorMessage: messages,
+        errors: []
     });
 };
 
@@ -103,6 +104,9 @@ exports.postLogin = (req, res) => {
     //     req.flash('error', 'Fields missing');
     //     return res.redirect('/login');
     // };
+    const email = req.body.email;
+    const password = req.body.password;
+
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
@@ -110,17 +114,22 @@ exports.postLogin = (req, res) => {
             path: '/login',
             title: 'Login',
             docTitle: 'Login',
-            errorMessage: errors.array()[0].msg
+            errorMessage: errors.array()[0].msg,
+            oldInput: {
+                email: email,
+                password: password
+            },
+            errors: errors.array()
         });
     }
 
-    User.findOne({ email: req.body.email })
+    User.findOne({ email: email })
         .then(user => {
             if (!user) {
                 req.flash('error', 'Invalid email');
                 return res.redirect('auth/login');
             }
-            bcrypt.compare(req.body.password, user.password)
+            bcrypt.compare(password, user.password)
                 .then(doMatch => {
                     if (doMatch) {
                         // Session
@@ -157,7 +166,13 @@ exports.postSignup = (req, res) => {
             path: '/signup',
             title: 'Signup',
             docTitle: 'Signup',
-            errorMessage: errors.array()[0].msg
+            errorMessage: errors.array()[0].msg,
+            oldInput: {
+                email: email,
+                password: password,
+                confirmPassword: req.body.confirmPassword 
+            },
+            errors: errors.array()
         });
     }
 
