@@ -99,15 +99,26 @@ exports.getNewPassword = (req, res) => {
 exports.postLogin = (req, res) => {
     // Cookie
     // req.setHeader('Set-Cookie', 'isLogedIn=true');
-    if (!req.body.email) {
-        req.flash('error', 'Fields missing');
-        return res.redirect('/login');
-    };
+    // if (!req.body.email) {
+    //     req.flash('error', 'Fields missing');
+    //     return res.redirect('/login');
+    // };
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+        return res.status(422).render('auth/login', {
+            path: '/login',
+            title: 'Login',
+            docTitle: 'Login',
+            errorMessage: errors.array()[0].msg
+        });
+    }
+
     User.findOne({ email: req.body.email })
         .then(user => {
             if (!user) {
                 req.flash('error', 'Invalid email');
-                return res.redirect('/login');
+                return res.redirect('auth/login');
             }
             bcrypt.compare(req.body.password, user.password)
                 .then(doMatch => {
@@ -121,7 +132,7 @@ exports.postLogin = (req, res) => {
                         });
                     }
                     req.flash('error', 'Invalid password');
-                    res.redirect('/login');
+                    res.redirect('auth/login');
                 })
                 .catch(e => {
                     console.log('Error comparing password', e);
@@ -146,10 +157,10 @@ exports.postSignup = (req, res) => {
             path: '/signup',
             title: 'Signup',
             docTitle: 'Signup',
-            errorMessage: errors.array()
+            errorMessage: errors.array()[0].msg
         });
     }
-    
+
     return bcrypt.hash(password, 12)
         .then(hashedPassword => {
             const newUser = new User({

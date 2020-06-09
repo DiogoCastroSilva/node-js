@@ -19,7 +19,11 @@ router.get('/new-password/:token', authController.getNewPassword);
 // POST
 router.post(
     '/login',
-    check('email').isEmail().withMessage('Please enter a valid email'),
+    [
+        body('email').isEmail().withMessage('Please enter a valid email'),
+        body('password').isAlphanumeric().isLength({ min: 5 })
+            .withMessage('Enter a valid password that is 5 characters long and as numbers and text'),
+    ],
     authController.postLogin
 );
 router.post('/logout', authController.postLogout);
