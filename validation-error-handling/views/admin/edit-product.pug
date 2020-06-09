@@ -3,21 +3,44 @@ block styles
     link(rel="stylesheet", href="/css/product.css")
     link(rel="stylesheet", href="/css/forms.css")
 block content
+    if errorMessage
+            .user-message.user-message--error #{ errorMessage }
     form.product-form(action=editing ? "/admin/edit-product" : "/admin/add-product" method="POST")
         .form-control
             label(for="title") Title
-            input(type="text" name="title" value=editing ? product.title : '')#title
+            input(
+                type="text"
+                name="title"
+                value=editing || hasError ? product.title : ''
+                class=class=errors.find(e => e.param === 'title') ? 'invalid' : ''
+            )#title
         .form-control
             label(for="imageUrl") Image Url
-            input(type="text" name="imageUrl" value=editing ? product.imageUrl : '')#imageUrl
+            input(
+                type="text"
+                name="imageUrl"
+                value=editing || hasError ? product.imageUrl : ''
+                class=class=errors.find(e => e.param === 'imageUrl') ? 'invalid' : ''
+            )#imageUrl
         .form-control
             label(for="price") Price
-            input(type="number" name="price" step="0.01" value=editing ? product.price : '')#price
+            input(
+                type="number"
+                name="price"
+                step="0.01"
+                value=editing || hasError ? product.price : ''
+                class=class=errors.find(e => e.param === 'price') ? 'invalid' : ''
+            )#price
         .form-control
             label(for="description") Description
             input(type="hidden" name="_csrf" value=csrfToken)
-            if editing
-                textarea(type="text" name="description" rows="5")#description #{product.description}
+            if editing || hasError
+                textarea(
+                    type="text"
+                    name="description"
+                    rows="5"
+                    class=class=errors.find(e => e.param === 'description') ? 'invalid' : ''
+                )#description #{product.description}
             else
                 textarea(type="text" name="description" rows="5")#description
             if editing

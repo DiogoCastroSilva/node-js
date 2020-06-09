@@ -28,50 +28,52 @@ exports.getLogin = (req, res) => {
     //     .trim()
     //     .split('=')[1];
 
-    let messages = req.flash('error');
-    if (messages.length > 0) {
-        messages = messages[0];
-    } else {
-        messages = null;
-    }
+    // let messages = req.flash('error');
+    // if (messages.length > 0) {
+    //     messages = messages[0];
+    // } else {
+    //     messages = null;
+    // }
     res.render('auth/login', {
         path: '/login',
         title: 'Login',
         docTitle: 'Login',
-        errorMessage: messages
+        errorMessage: null,
+        errors: null
     });
 };
 
 exports.getSignup = (req, res) => {
-    let messages = req.flash('error');
-    if (messages.length > 0) {
-        messages = messages[0];
-    } else {
-        messages = null;
-    }
+    // let messages = req.flash('error');
+    // if (messages.length > 0) {
+    //     messages = messages[0];
+    // } else {
+    //     messages = null;
+    // }
 
     res.render('auth/signup', {
         path: '/signup',
         title: 'Signup',
         docTitle: 'Signup',
-        errorMessage: messages,
-        errors: []
+        errorMessage: null,
+        errors: null
     });
 };
 
 exports.getReset = (req, res) => {
-    let messages = req.flash('error');
-    if (messages.length > 0) {
-        messages = messages[0];
-    } else {
-        messages = null;
-    }
+    // let messages = req.flash('error');
+    // if (messages.length > 0) {
+    //     messages = messages[0];
+    // } else {
+    //     messages = null;
+    // }
 
     res.render('auth/reset', {
         path: '/reset',
         title: 'Reset',
         docTitle: 'Reset',
-        errorMessage: messages
+        errorMessage: null,
+        error: null
     });
 };
 
