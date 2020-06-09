@@ -16,7 +16,7 @@ exports.getProducts = (req, res) => {
     });
 };
 
-exports.getProduct = (req, res) => {
+exports.getProduct = (req, res, next) => {
     const id = req.params.id;
     Product.findById(id).then(product => {
         res.render('shop/product-detail', {
@@ -25,10 +25,15 @@ exports.getProduct = (req, res) => {
             path: '/product-detail',
             product: product
         });
+    })
+    .catch(e => {
+        const error = new Error('Error getting product: ' + e);
+        error.httpStatusCode = 500;
+        return next(error);
     });
 };
 
-exports.getIndex = (req, res) => {
+exports.getIndex = (req, res, next) => {
     Product.find().then(products => {
         res.render('shop/index', {
             title: 'Shop',
@@ -38,10 +43,15 @@ exports.getIndex = (req, res) => {
             // isAuthenticated: req.session.isLoggedIn,
             // csrfToken: req.csrfToken()
         });
+    })
+    .cart(e => {
+        const error = new Error('Error getting product: ' + e);
+        error.httpStatusCode = 500;
+        return next(error);
     });
 };
 
-exports.getCart = (req, res) => {
+exports.getCart = (req, res, next) => {
     req.user
         .populate('cart.items.productId')
         .execPopulate()
@@ -52,10 +62,15 @@ exports.getCart = (req, res) => {
                 path: '/cart',
                 products: user.cart.items
             });
+        })
+        .catch(e => {
+            const error = new Error('Error getting cart products: ' + e);
+            error.httpStatusCode = 500;
+            return next(error);
         });
 };
 
-exports.getOrders = (req, res) => {
+exports.getOrders = (req, res, next) => {
     Order.find({ 'user.userId': req.user._id })
         .then(orders => {
             res.render('shop/orders', {
@@ -64,6 +79,11 @@ exports.getOrders = (req, res) => {
                 path: '/orders',
                 orders: orders
             });
+        })
+        .catch(e => {
+            const error = new Error('Error getting orders: ' + e);
+            error.httpStatusCode = 500;
+            return next(error);
         });
 };
 
@@ -76,25 +96,36 @@ exports.getCheckout = (req, res) => {
 };
 
 // POST
-exports.addToCart = (req, res) => {
+exports.addToCart = (req, res, next) => {
     const id = req.body.id;
     Product.findById(id).then(product => {
         return req.user.addToCart(product);
-    }).then(result => {
+    })
+    .then(result => {
         console.log('Add to cart', result);
         res.redirect('/cart');
-    });
+    })
+    .catch(e => {
+        const error = new Error('Error adding to cart: ' + e);
+        error.httpStatusCode = 500;
+        return next(error);
+    });;
 };
 
-exports.postDeleteProduct = (req, res) => {
+exports.postDeleteProduct = (req, res, next) => {
     const id = req.body.id;
 
     req.user.removeFromCart(id).then(() => {
         res.redirect('/cart');
+    })
+    .catch(e => {
+        const error = new Error('Error deleting product: ' + e);
+        error.httpStatusCode = 500;
+        return next(error);
     });
 };
 
-exports.addOrder = (req, res) => {
+exports.addOrder = (req, res, next) => {
     req.user
         .populate('cart.items.productId')
         .execPopulate()
@@ -120,5 +151,10 @@ exports.addOrder = (req, res) => {
         })
         .then(() => {
             res.redirect('/orders');
+        })
+        .catch(e => {
+            const error = new Error('Error adding order: ' + e);
+            error.httpStatusCode = 500;
+            return next(error);
         });
 };

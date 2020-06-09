@@ -17,7 +17,7 @@ exports.getAddProduct = (req, res) => {
     });
 };
 
-exports.getEditProduct = (req, res) => {
+exports.getEditProduct = (req, res, next) => {
     const id = req.params.id;
 
     Product.findById(id).then(product => {
@@ -29,10 +29,14 @@ exports.getEditProduct = (req, res) => {
             errorMessage: null,
             product: product
         });
+    }).catch(e => {
+        const error = new Error('Getting Product error: ' + e);
+        error.httpStatusCode = 500;
+        return next(error);
     });
 };
 
-exports.getProducts = (req, res) => {
+exports.getProducts = (req, res, next) => {
     Product.find({ userId: req.user._id }).then(products => {
         res.render('admin/products', {
             title: 'All Products',
@@ -43,11 +47,15 @@ exports.getProducts = (req, res) => {
             errorMessage: null,
             errors: null
         });
+    }).catch(e => {
+        const error = new Error('Getting Products error: ' + e);
+        error.httpStatusCode = 500;
+        return next(error);
     });
 };
 
 // // POST
-exports.postAddProduct = (req, res) => {
+exports.postAddProduct = (req, res, next) => {
     const title = req.body.title;
     const imageUrl = req.body.imageUrl;
     const description = req.body.description;
@@ -79,12 +87,37 @@ exports.postAddProduct = (req, res) => {
         userId: req.user._id
     });
 
-    product.save().then(() => {
-        res.redirect('/admin/products');
-    });
+    product.save()
+        .then(() => {
+            res.redirect('/admin/products');
+        }).catch(e => {
+            // First Option
+            // return res.status(500).render('admin/edit-product', {
+            //     title: 'Add Product',
+            //     path: '/admin/edit-product',
+            //     editing: false,
+            //     hasError: true,
+            //     errorMessage: 'Database error',
+            //     errors: null,
+            //     product: {
+            //         title: title,
+            //         imageUrl: imageUrl,
+            //         description: description,
+            //         price: price
+            //     }
+            // });
+
+            // Second Option
+            // res.redirect('/500');
+
+            // Best Option
+            const error = new Error('Add Product error: ' + e);
+            error.httpStatusCode = 500;
+            return next(error);
+        });
 };
 
-exports.postEditProduct = (req, res) => {
+exports.postEditProduct = (req, res, next) => {
     const id = req.body.id;
     const title = req.body.title;
     const imageUrl = req.body.imageUrl;
@@ -120,19 +153,30 @@ exports.postEditProduct = (req, res) => {
         product.description = description;
         product.price = price;
 
-        return product.save().then(() => {
-            res.redirect('/admin/products');
-        });
+        return product.save()
+            .then(() => {
+                res.redirect('/admin/products');
+            })
+            .catch(e => {
+                const error = new Error('Edit Product error: ' + e);
+                error.httpStatusCode = 500;
+                return next(error);
+            });
     })
     
 };
 
 // // DELETE
-exports.deleteProduct = (req, res) => {
+exports.deleteProduct = (req, res, next) => {
     const id = req.params.id;
     Product
         .deleteOne({ _id: id, userId: req.user._id })
         .then(() => {
             res.redirect('/admin/products');
+        })
+        .catch(e => {
+            const error = new Error('Deleting Product error: ' + e);
+            error.httpStatusCode = 500;
+            return next(error);
         });
 };

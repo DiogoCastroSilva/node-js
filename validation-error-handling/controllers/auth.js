@@ -77,7 +77,7 @@ exports.getReset = (req, res) => {
     });
 };
 
-exports.getNewPassword = (req, res) => {
+exports.getNewPassword = (req, res, next) => {
     const token = req.params.token;
 
     User.findOne({
@@ -95,11 +95,16 @@ exports.getNewPassword = (req, res) => {
             userId: user._id.toString(),
             passwordToken: token
         });
+    })
+    .catch(e => {
+        const error = new Error('Getting new Password error: ' + e);
+        error.httpStatusCode = 500;
+        return next(error);
     });
 };
 
 // POST
-exports.postLogin = (req, res) => {
+exports.postLogin = (req, res, next) => {
     // Cookie
     // req.setHeader('Set-Cookie', 'isLogedIn=true');
     // if (!req.body.email) {
@@ -146,8 +151,15 @@ exports.postLogin = (req, res) => {
                     res.redirect('auth/login');
                 })
                 .catch(e => {
-                    console.log('Error comparing password', e);
+                    const error = new Error('Error comparing password: ' + e);
+                    error.httpStatusCode = 500;
+                    return next(error);
                 });
+        })
+        .catch(e => {
+            const error = new Error('Error finding user: ' + e);
+            error.httpStatusCode = 500;
+            return next(error);
         })
 };
 
@@ -157,7 +169,7 @@ exports.postLogout = (req, res) => {
     });
 };
 
-exports.postSignup = (req, res) => {
+exports.postSignup = (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
 
@@ -178,29 +190,32 @@ exports.postSignup = (req, res) => {
         });
     }
 
-    return bcrypt.hash(password, 12)
-        .then(hashedPassword => {
-            const newUser = new User({
-                email: email,
-                password: hashedPassword,
-                cart: { items: [] }
-            });
-            return newUser.save();
-        })
-        .then(() => {
-            res.redirect('/login');
-            return transporter.sendMail({
-                to: email,
-                from: 'email',
-                subject: 'Welcome to Shop',
-                html: '<h1>You successfuly signed up!</h1>'
-            });
-        }).catch(e => {
-            console.log('Error while sign up:', e);
-        });;
+    return bcrypt
+            .hash(password, 12)
+            .then(hashedPassword => {
+                const newUser = new User({
+                    email: email,
+                    password: hashedPassword,
+                    cart: { items: [] }
+                });
+                return newUser.save();
+            })
+            .then(() => {
+                res.redirect('/login');
+                return transporter.sendMail({
+                    to: email,
+                    from: 'email',
+                    subject: 'Welcome to Shop',
+                    html: '<h1>You successfuly signed up!</h1>'
+                });
+            }).catch(e => {
+                const error = new Error('Error while signing up: ' + e);
+                error.httpStatusCode = 500;
+                return next(error);
+            });;
 };
 
-exports.postReset = (req, res) => {
+exports.postReset = (req, res, next) => {
     crypto.randomBytes(32, (error, buffer) => {
         if (error) {
             console.log('Error creating crypto', error);
@@ -209,31 +224,41 @@ exports.postReset = (req, res) => {
 
         const token = buffer.toString('hex');
 
-        User.findOne({ email: req.body.email }).then(user => {
-            if (!user) {
-                req.flash('error', 'No account with this email found');
-                return res.redirect('/reset');
-            }
+        User.findOne({ email: req.body.email })
+            .then(user => {
+                if (!user) {
+                    req.flash('error', 'No account with this email found');
+                    return res.redirect('/reset');
+                }
 
-            user.resetToken = token;
-            user.resetTokenExpiration = Date.now() + 3600000;
-            return user.save();
-        }).then(() => {
-            res.redirect('/');
-            transporter.sendMail({
-                to: req.body.email,
-                from: 'email',
-                subject: 'Password reset',
-                html: `
-                    <p>You requested a password reset</p>
-                    <p>Click this <a href="http://localhost:3000/new-password/${token}">link</a> to set new password</p>
-                `
+                user.resetToken = token;
+                user.resetTokenExpiration = Date.now() + 3600000;
+                return user.save();
+            }).then(() => {
+                res.redirect('/');
+                try {
+                    transporter.sendMail({
+                        to: req.body.email,
+                        from: 'email',
+                        subject: 'Password reset',
+                        html: `
+                            <p>You requested a password reset</p>
+                            <p>Click this <a href="http://localhost:3000/new-password/${token}">link</a> to set new password</p>
+                        `
+                    });
+                } catch(e) {
+                    console.log(e);
+                }
+            })
+            .cart(e => {
+                const error = new Error('Error while signing up: ' + e);
+                error.httpStatusCode = 500;
+                return next(error);
             });
-        });
     });
 };
 
-exports.postNewPassword = (req, res) => {
+exports.postNewPassword = (req, res, next) => {
     const newPassword = req.body.newPassword;
     const userId = req.body.userId;
     const passwordToken = req.body.passwordToken;
@@ -261,6 +286,8 @@ exports.postNewPassword = (req, res) => {
             
         })
         .catch(e => {
-            console.log('Error saving new passwrod', e);
+            const error = new Error('Error saving new passwrod: ' + e);
+            error.httpStatusCode = 500;
+            return next(error);
         });
 }
