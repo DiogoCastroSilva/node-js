@@ -138,7 +138,6 @@ exports.postLogout = (req, res) => {
 exports.postSignup = (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
-    const confirmPassword = req.body.confirmPassword;
 
     const errors = validationResult(req);
 
@@ -150,34 +149,27 @@ exports.postSignup = (req, res) => {
             errorMessage: errors.array()
         });
     }
-    User.findOne({email: email})
-        .then(user => {
-            if (user) {
-                req.flash('error', 'Email alredy exists, login or pick a new one');
-                return res.redirect('/signup');
-            }
-
-            return bcrypt.hash(password, 12)
-                .then(hashedPassword => {
-                    const newUser = new User({
-                        email: email,
-                        password: hashedPassword,
-                        cart: { items: [] }
-                    });
-                    return newUser.save();
-                })
-                .then(() => {
-                    res.redirect('/login');
-                    return transporter.sendMail({
-                        to: email,
-                        from: 'email',
-                        subject: 'Welcome to Shop',
-                        html: '<h1>You successfuly signed up!</h1>'
-                    });
-                }).catch(e => {
-                    console.log('Error while sign up:', e);
-                });;
-        });
+    
+    return bcrypt.hash(password, 12)
+        .then(hashedPassword => {
+            const newUser = new User({
+                email: email,
+                password: hashedPassword,
+                cart: { items: [] }
+            });
+            return newUser.save();
+        })
+        .then(() => {
+            res.redirect('/login');
+            return transporter.sendMail({
+                to: email,
+                from: 'email',
+                subject: 'Welcome to Shop',
+                html: '<h1>You successfuly signed up!</h1>'
+            });
+        }).catch(e => {
+            console.log('Error while sign up:', e);
+        });;
 };
 
 exports.postReset = (req, res) => {

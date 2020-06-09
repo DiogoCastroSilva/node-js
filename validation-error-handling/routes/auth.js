@@ -5,7 +5,8 @@ const { check, body } = require('express-validator');
 
 // Controllers
 const authController = require('../controllers/auth');
-
+// Models
+const User = require('../models/user');
 
 const router = express.Router();
 
@@ -30,10 +31,16 @@ router.post(
             .withMessage('Please enter a valid email')
             .custom((value, {req}) => {
                 // Exemple of a custom validation
-                if (value === 'test@test.com') {
-                    throw new Error('This email address is forbiden');
-                }
-                return true;
+                // if (value === 'test@test.com') {
+                //     throw new Error('This email address is forbiden');
+                // }
+                // return true;
+                User.findOne({email: value})
+                    .then(user => {
+                        if (user) {
+                            return Promise.reject('Email alredy exists, login or pick a new one');
+                        }
+                    })
             }),
         body(
             'password',
