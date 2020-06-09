@@ -202,11 +202,13 @@ exports.deleteProduct = (req, res, next) => {
                     .deleteOne({ _id: id, userId: req.user._id });
     })
     .then(() => {
-        res.redirect('/admin/products');
+        res.status(200).json({
+            message: 'Success'
+        });
     })
     .catch(e => {
-        const error = new Error('Deleting Product error: ' + e);
-        error.httpStatusCode = 500;
-        return next(error);
+        res.status(500).json({
+            message: 'Error'
+        });
     });
 };
