@@ -5,27 +5,27 @@ const Post = require('../models/post');
 
 // GET
 exports.getPosts = (req, res, next) => {
-    res.status(200).json({
-        posts: [
-            {
-                _id: new Date().toISOString(),
-                title: 'First Post',
-                content: 'This is the first post',
-                imageUrl: 'images/bride-duck',
-                creator: {
-                    name: 'Diogo'
-                },
-                createdAt: new Date()
+    Post.find()
+        .then(posts => {
+            res.status(200)
+                .json({
+                    message: 'Fetched posts successfully',
+                    posts: posts
+                });
+        })
+        .catch(e => {
+            if (!e.statusCode) {
+                e.statusCode = 500;
             }
-        ]
-    });
+            next(e);
+        });
+    
 };
 
 exports.getPost = (req, res, next) => {
     const id = req.params.id;
 
-    Post
-        .findById(id)
+    Post.findById(id)
         .then(post => {
             if (!post) {
                 const error = new Error('Could not found post');
@@ -34,8 +34,7 @@ exports.getPost = (req, res, next) => {
                 throw error;
             }
 
-            res
-                .status(200)
+            res.status(200)
                 .json({
                     message: 'Post fetched',
                     post: post
@@ -45,7 +44,7 @@ exports.getPost = (req, res, next) => {
             if (!e.statusCode) {
                 e.statusCode = 500;
             }
-            next(e)
+            next(e);
         });
 };
 
@@ -70,8 +69,7 @@ exports.createPost = (req, res, next) => {
         }
     });
 
-    post
-        .save()
+    post.save()
         .then(result => {
             res.status(201).json({
                 message: 'The post was created successfully',
@@ -82,6 +80,6 @@ exports.createPost = (req, res, next) => {
             if (!e.statusCode) {
                 e.statusCode = 500;
             }
-            next(e)
+            next(e);
         });
 };
