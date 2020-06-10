@@ -10,6 +10,7 @@ const router = express.Router();
 
 // GET /feed/posts
 router.get('/posts',feedController.getPosts);
+router.get('/post/:id', feedController.getPost);
 
 // Post
 router.post('/post', [
