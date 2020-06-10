@@ -14,8 +14,6 @@ block content
                             input(type="hidden" name="id" value=product.productId._id)
                             button.btn.danger(type="submit") Delete
             .centered
-                form(action="/create-order" method="POST")
-                    input(type="hidden" name="_csrf" value=csrfToken)
-                    button.btn(type="submit") Order Now
+                a.btn(href="/checkout") Order Now
         else
             h1 No Products in cart

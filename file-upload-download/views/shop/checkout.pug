@@ -1,3 +1,23 @@
 extends ../layouts/main-layout.pug
 block styles
+    link(rel="stylesheet", href="/css/cart.css")
 block content
+    main
+        ul.cart__item-list
+                each product in products
+                    li.cart__item
+                        h1 #{product.productId.title}
+                        h2 Quantity: #{product.quantity}
+        .centered
+            h2 Total: #{totalSum}
+        .centered
+            button.btn#order-btn ORDER
+            script(src="https://js.stripe.com/v3/")
+            script.
+                var stripe = Stripe('pk_test_51GsQlAAxJTVl3mJaCeYOLbetzpqvxgi8BlqBZfo5PmnAudCnVPXNsI8AQ9AGg8fMKylVKKoqGS8mF16GwKS6ootJ00JvpHFMQi');
+                var orderBtn = document.getElementById('order-btn');
+                orderBtn.addEventListener('click', function() {
+                    stripe.redirectToCheckout({
+                        sessionId: `#{sessionId}`
+                    });
+                });
