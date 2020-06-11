@@ -10,12 +10,23 @@ const Post = require('../models/post');
 
 // GET
 exports.getPosts = (req, res, next) => {
-    Post.find()
+    const page = req.query.page || 1;
+    console.log('page query', page);
+    const perPage = 2;
+    let totalItems;
+    Post.countDocuments()
+        .then(numberOfDocs => {
+            totalItems = numberOfDocs;
+            return Post.find()
+                .skip((page - 1) * perPage)
+                .limit(perPage);
+        })
         .then(posts => {
             res.status(200)
                 .json({
                     message: 'Fetched posts successfully',
-                    posts: posts
+                    posts: posts,
+                    totalItems: totalItems
                 });
         })
         .catch(e => {
@@ -24,7 +35,6 @@ exports.getPosts = (req, res, next) => {
             }
             next(e);
         });
-    
 };
 
 exports.getPost = (req, res, next) => {
