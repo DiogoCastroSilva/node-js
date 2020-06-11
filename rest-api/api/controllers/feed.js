@@ -1,3 +1,8 @@
+// Core
+const fs = require('fs');
+const path = require('path');
+
+// Packages
 const { validationResult } = require('express-validator');
 
 // Models
@@ -89,4 +94,64 @@ exports.createPost = (req, res, next) => {
             }
             next(e);
         });
+};
+
+// PUT
+exports.updatePost = (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        const error = new Error('Validation failed, entered data is incorrect');
+        error.statusCode = 422;
+        throw error;
+    }
+
+    let imageUrl = req.body.image;
+    if (req.file) {
+        imageUrl = req.file.path;
+    }
+    if (!imageUrl) {
+        const error = new Error('No file picked');
+        error.statusCode = 422;
+        throw error;
+    }
+
+    const id = req.params.id;
+
+    Post.findById(id)
+        .then(post => {
+            if (!post) {
+                const error = new Error('Could not found post');
+                error.statusCode = 404;
+                // cath will use next
+                throw error;
+            }
+
+            // Delete old image
+            if (imageUrl !== post.imageUrl) {
+                clearImage(post.imageUrl);
+            }
+
+            post.title = req.body.title;
+            post.content = req.body.content;
+            post.imageUrl = imageUrl;
+
+            return post.save();
+        })
+        .then(response => {
+            res.status(200).json({
+                message: 'Post updated',
+                post: response
+            });
+        })
+        .catch(e => {
+            if (!e.statusCode) {
+                e.statusCode = 500;
+            }
+            next(e);
+        });
+};
+
+const clearImage = filePath => {
+    filePath = path.join(__dirname, '..', filePath);
+    fs.unlink(filePath, e => console.log('Error deleting image file', e));
 };

@@ -22,4 +22,15 @@ router.post('/post', [
         .isLength({ min: 5 })
 ], feedController.createPost);
 
+// PUT - Update
+router.put('/post/:id',[
+    body('title')
+        .trim()
+        .isLength({ min: 5 }),
+    body('content')
+        .trim()
+        .isLength({ min: 5 }),
+], feedController.updatePost);
+
+
 module.exports = router;
