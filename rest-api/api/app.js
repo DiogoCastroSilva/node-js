@@ -1,10 +1,11 @@
 // Core
-const express = require('express');
 const path = require('path');
 
 // Packages
+const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const multer = require('multer');
 
 
 // Routes
@@ -13,8 +14,37 @@ const feedRoutes = require('./routes/feed');
 // Create Server
 const app = express();
 
+const fileStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'images');
+    },
+    filename: (req, file, cb) => {
+        cb(null, new Date().toISOString() + '-' + file.originalname);
+    }
+});
+
+const fileFilter = (req, file, cb) => {
+    if (
+        file.mimetype === 'image/png' ||
+        file.mimetype === 'image/jpg' ||
+        file.mimetype === 'image/jpeg'
+    ) {
+        cb(null, true);
+    } else {
+        cb(null, false);
+    }
+};
+
 // Serving json data
 app.use(bodyParser.json());
+// Muler config for serving and saving images
+app.use(
+    multer({
+        storage: fileStorage,
+        fileFilter: fileFilter
+    })
+    .single('image')
+);
 // Serving folder images
 app.use(
     '/images',
@@ -24,7 +54,7 @@ app.use(
 // Seting CORS Headers
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
+    res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, PUT, PATCH, DELETE');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     next();
 });
