@@ -122,7 +122,6 @@ exports.updatePost = (req, res, next) => {
             if (!post) {
                 const error = new Error('Could not found post');
                 error.statusCode = 404;
-                // cath will use next
                 throw error;
             }
 
@@ -151,7 +150,39 @@ exports.updatePost = (req, res, next) => {
         });
 };
 
+// DELETE
+exports.deletePost = (req, res, next) => {
+    const id = req.params.id;
+    Post.findById(id)
+        .then(post => {
+            if (!post) {
+                const error = new Error('Could not found post');
+                error.statusCode = 404;
+                throw error;
+            }
+            clearImage(post.imageUrl);
+            return Post.findByIdAndRemove(id);
+        })
+        .then(() => {
+            res.status(200).json({
+                message: 'Deleted Post'
+            });
+        })
+        .catch(e => {
+            if (!e.statusCode) {
+                e.statusCode = 500;
+            }
+            next(e);
+        });
+};
+
+
+// Util
 const clearImage = filePath => {
     filePath = path.join(__dirname, '..', filePath);
-    fs.unlink(filePath, e => console.log('Error deleting image file', e));
+    fs.unlink(filePath, e => {
+        if (e) {
+            console.log('Error deleting image file', e)
+        }
+    });
 };
