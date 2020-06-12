@@ -10,6 +10,7 @@ const multer = require('multer');
 
 // Routes
 const feedRoutes = require('./routes/feed');
+const authRoutes = require('./routes/auth');
 
 // Create Server
 const app = express();
@@ -60,16 +61,20 @@ app.use((req, res, next) => {
 });
 
 app.use('/feed', feedRoutes);
+app.use('/auth', authRoutes);
 
 // Error handling
 app.use((error, req, res, next) => {
     console.log('Error middleware', error);
     const status = error.statusCode || 500;
     const message = error.message;
+    const data = error.data;
+    
     res
         .status(status)
         .json({
-            message: message
+            message: message,
+            data: data
         });
 });
 
