@@ -7,6 +7,27 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 
+// GET
+exports.getStatus = (req, res, next) => {
+    User.findById(req.userId)
+        .then(user => {
+            if (!user) {
+                const error = new Error('Failed to get user');
+                error.statusCode = 401;
+                throw error;
+            }
+            res.status(200).json({
+                status: user.status
+            });
+        })
+        .catch(e => {
+            if (!e.statusCode) {
+                e.statusCode = 500;
+            }
+            next(e);
+        });
+};
+
 // POST
 exports.login = (req, res, next) => {
     const email = req.body.email;
@@ -22,7 +43,7 @@ exports.login = (req, res, next) => {
             user = userDoc;
             const password = req.body.password;
 
-            return bcrypt.compare(password, user.password);
+            return bcrypt.compare(password, userDoc.password);
         })
         .then(isEqual => {
             if (!isEqual) {
@@ -91,5 +112,39 @@ exports.signup = (req, res, next) => {
             }
             next(e);
         });
+};
 
+// PATCH
+exports.updateStatus = (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        const error = new Error('Validation failed');
+        error.statusCode = 422;
+        error.data = errors.array();
+        throw error;
+    }
+
+    User.findById(req.userId)
+        .then(user => {
+            if (!user) {
+                const error = new Error('Failed to get user');
+                error.statusCode = 401;
+                throw error;
+            }
+
+            user.status = req.body.status;
+            return user.save();
+        })
+        .then(result => {
+            res.status(201).json({
+                message: 'User status updated!',
+                id: result._id
+            });
+        })
+        .catch(e => {
+            if (!e.statusCode) {
+                e.statusCode = 500;
+            }
+            next(e);
+        });
 };
