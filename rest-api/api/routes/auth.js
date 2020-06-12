@@ -10,6 +10,9 @@ const User = require('../models/user');
 
 const router = express.Router();
 
+// POST
+router.post('/login', authController.login);
+
 // PUT
 router.put('/signup', [
     body('email')
