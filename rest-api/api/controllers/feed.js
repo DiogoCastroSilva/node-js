@@ -9,6 +9,9 @@ const { validationResult } = require('express-validator');
 const Post = require('../models/post');
 const User = require('../models/user');
 
+// Socket
+const io = require('../socket');
+
 // GET
 exports.getPosts = async (req, res, next) => {
     const page = req.query.page || 1;
@@ -16,6 +19,9 @@ exports.getPosts = async (req, res, next) => {
     try {
         const totalItems = await Post.find().countDocuments()
         const posts = await Post.find()
+            .populate('creator')
+            // Sorting in a descending way
+            .sort({ createdAt: -1 })
             .skip((page - 1) * perPage)
             .limit(perPage);
 
@@ -88,6 +94,17 @@ exports.createPost = async (req, res, next) => {
         const user = await User.findById(req.userId);
         user.posts.push(post);
         await user.save();
+        io.getIo().emit('posts', {
+            action: 'create',
+            post: {
+                ...post._doc,
+                creator: {
+                    _id: req.userId,
+                    name: user.name
+                }
+
+            }
+        });
         res.status(201).json({
             message: 'The post was created successfully',
             post: post,
@@ -125,14 +142,15 @@ exports.updatePost = async (req, res, next) => {
 
     const id = req.params.id;
     try {
-        const post = await Post.findById(id);
+        const post = await Post.findById(id)
+            .populate('creator');
         if (!post) {
             const error = new Error('Could not found post');
             error.statusCode = 404;
             throw error;
         }
 
-        if (post.creator.toString() !== req.userId) {
+        if (post.creator._id.toString() !== req.userId) {
             const error = new Error('Not authorized');
             error.statusCode = 403;
             throw error;
@@ -148,6 +166,7 @@ exports.updatePost = async (req, res, next) => {
         post.imageUrl = imageUrl;
 
         const response = await post.save();
+        io.getIo().emit('posts', { action: 'update', post: response });
         res.status(200).json({
             message: 'Post updated',
             post: response
@@ -182,6 +201,8 @@ exports.deletePost = async (req, res, next) => {
         const user = await User.findById(req.userId);
         user.posts.pull(id);
         await user.save();
+
+        io.getIo().emit('posts', { action: 'delete', post: id });
         res.status(200).json({
             message: 'Deleted Post'
         });

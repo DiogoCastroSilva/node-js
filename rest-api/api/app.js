@@ -84,7 +84,12 @@ mongoose
         'mongodb+srv://Diogo:asdzxc@cluster0-fnsz5.mongodb.net/messages?retryWrites=true&w=majority'
     )
     .then(() => {
-        app.listen(8080);
+        const server = app.listen(8080);
+
+        const io = require('./socket').init(server);
+        io.on('connection', socket => {
+            console.log('client connected');
+        });
     })
     .catch(e => {
         throw new Error('Error connecting to database', e);
