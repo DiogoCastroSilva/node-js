@@ -76,8 +76,6 @@ exports.createPost = async (req, res, next) => {
     const imageUrl = req.file.path;
     const title = req.body.title;
     const content = req.body.content;
-    let creator;
-
     const post = new Post({
         title: title,
         content: content,
@@ -88,15 +86,14 @@ exports.createPost = async (req, res, next) => {
     try {
         await post.save()
         const user = await User.findById(req.userId);
-        creator = user;
         user.posts.push(post);
         await user.save();
         res.status(201).json({
             message: 'The post was created successfully',
             post: post,
             creator: {
-                _id: creator._id,
-                name: creator.name
+                _id: user._id,
+                name: user.name
             }
         });
     } catch(e) {
