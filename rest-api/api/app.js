@@ -81,7 +81,7 @@ app.use((error, req, res, next) => {
 // Connecting to database and turning the server on
 mongoose
     .connect(
-        'mongodb+srv://Diogo:asdzxc@cluster0-fnsz5.mongodb.net/messages?retryWrites=true&w=majority'
+        'MONGO_DB_LINK'
     )
     .then(() => {
         const server = app.listen(8080);

@@ -105,22 +105,24 @@ app.use(errorController.get404Page);
 
 // Mongoose
 mongoose
-    .connect('mongodb+srv://Diogo:asdzxc@cluster0-fnsz5.mongodb.net/shop?retryWrites=true&w=majority')
-    .then(() => {
-        User.findOne().then(user => {
-            if (!user) {
-                const user = new User({
-                    name: 'Diogo',
-                    email: 'diogo@diogo.com',
-                    cart: {
-                        items: []
-                    }
-                });
-                user.save();
-            }
+    .connect(
+        'MONGO_DB_LINK'
+        )
+        .then(() => {
+            User.findOne().then(user => {
+                if (!user) {
+                    const user = new User({
+                        name: 'Diogo',
+                        email: 'diogo@diogo.com',
+                        cart: {
+                            items: []
+                        }
+                    });
+                    user.save();
+                }
+            });
+            
+            app.listen(3000);
+        }).catch(e => {
+            console.log('Erro connecting to server', e);
         });
-        
-        app.listen(3000);
-    }).catch(e => {
-        console.log('Erro connecting to server', e);
-    });

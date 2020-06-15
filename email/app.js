@@ -8,7 +8,7 @@ const MongoDBStore = require('connect-mongodb-session')(session);
 const csrf = require('csurf');
 const flash = require('connect-flash');
 
-const MONGODB_URI = 'mongodb+srv://Diogo:asdzxc@cluster0-fnsz5.mongodb.net/shop?retryWrites=true&w=majority';
+const MONGODB_URI = 'MONGO_DB_LINK';
 // Mongoose
 const mongoose = require('mongoose');
 
