@@ -4,3 +4,6 @@ node_modules/
 .npm
 # Mac
 .DS_Store
+# Certificates
+server.cert
+server.key
