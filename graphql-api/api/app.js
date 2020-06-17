@@ -15,6 +15,8 @@ const auth = require('./middleware/auth');
 // Util
 const { clearImage } = require('./util/file');
 
+const MONGODB_URI = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0-fnsz5.mongodb.net/${process.env.MONGO_DB}`;
+
 const app = express();
 
 const fileStorage = multer.diskStorage({
@@ -105,11 +107,12 @@ app.use((error, req, res, next) => {
   res.status(status).json({ message: message, data: data });
 });
 
+console.log('url', MONGODB_URI);
 mongoose
   .connect(
-    'mongodb+srv://Diogo:asdzxc@cluster0-fnsz5.mongodb.net/messages?retryWrites=true&w=majority'
-    )
-  .then(result => {
+    MONGODB_URI
+  )
+  .then(() => {
     app.listen(8080);
   })
-  .catch(err => console.log(err));
+  .catch(err => console.log('Error connecting to server', err));

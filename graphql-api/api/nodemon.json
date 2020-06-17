@@ -1,0 +1,8 @@
+{
+    "env": {
+        "MONGO_USER": "Diogo",
+        "MONGO_PASSWORD": "asdzxc",
+        "MONGO_DB": "messages",
+        "STRIPE_KEY": "sk_test_51GsQlAAxJTVl3mJatcoewZOZQOZM5o3BtAd1x1ouSdCG2OvUFKDC7P3EimQpZEL4L4gpbwBUon2xExwEOiJ3rrSY001cQzhUO2"
+    }
+}
