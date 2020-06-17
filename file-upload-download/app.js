@@ -1,11 +1,13 @@
 // Core
 const path = require('path');
 const express = require('express');
+const fs = require('fs');
 // Packages
 const bodyParser = require('body-parser');
 const multer = require('multer');
 const helmet = require('helmet');
 const compression = require('compression');
+const morgan = require('morgan');
 // Session
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
@@ -62,9 +64,20 @@ app.set('view engine', 'pug');
 // Default behaviour
 app.set('views', 'views');
 
+// Add logging
+const accessLogStream = fs.createWriteStream(
+    path.join(__dirname, 'access.log'),
+    { flags: 'a' }
+);
+
 // Config
 app.use(helmet());
 app.use(compression());
+app.use(
+    morgan('combined',{
+        stream: accessLogStream
+    })
+);
 // Works only with text values
 app.use(bodyParser.urlencoded({ extended: false }));
 // Works with files - And looks for the input with id image
