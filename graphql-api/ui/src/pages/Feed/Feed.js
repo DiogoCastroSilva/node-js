@@ -153,6 +153,7 @@ class Feed extends Component {
     });
     const formData = new FormData();
     formData.append('image', postData.image);
+
     if (this.state.editPost) {
       console.log(this.state.editPost);
       formData.append('oldPath', this.state.editPost.imagePath);
@@ -189,6 +190,32 @@ class Feed extends Component {
           }
         `
       };
+
+      if (this.state.editPost) {
+        graphqlQuery = {
+          query: `
+            mutation {
+              updatePost(
+                  id: "${this.state.editPost._id}"
+                  postInput: {
+                    title: "${postData.title}",
+                    content: "${postData.content}",
+                    imageUrl: "${imageUrl}"
+                  }
+              ) {
+                _id
+                title
+                content
+                imageUrl
+                creator {
+                  name
+                }
+                createdAt
+              }
+            }
+          `
+        };
+      }
   
       fetch('http://localhost:8080/graphql', {
         method: 'POST',
@@ -208,14 +235,17 @@ class Feed extends Component {
           if (resData.errors) {
             throw new Error('User creation failed!');
           }
-  
+          let responseDataField = 'createPost';
+          if (this.state.editPost) {
+            responseDataField = 'updatePost'
+          }
           const post = {
-            _id: resData.data.createPost._id,
-            title: resData.data.createPost.title,
-            content: resData.data.createPost.content,
-            creator: resData.data.createPost.creator,
-            createdAt: resData.data.createPost.createdAt,
-            imagePath: resData.data.createPost.imageUrl
+            _id: resData.data[responseDataField]._id,
+            title: resData.data[responseDataField].title,
+            content: resData.data[responseDataField].content,
+            creator: resData.data[responseDataField].creator,
+            createdAt: resData.data[responseDataField].createdAt,
+            imagePath: resData.data[responseDataField].imageUrl
           };
           this.setState(prevState => {
             let updatedPosts = [...prevState.posts];
