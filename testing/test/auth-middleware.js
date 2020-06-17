@@ -1,5 +1,9 @@
 // Test
 const { expect } = require('chai');
+// Packages
+const jwt = require('jsonwebtoken');
+const sinon = require('sinon');
+
 // Middleware Component
 const authMiddleware = require('../middleware/is-auth');
 
@@ -20,5 +24,34 @@ describe('Auth Middleware', () => {
             }
         };
         expect(authMiddleware.bind(this, req, {}, () => {})).to.throw();
+    });
+
+    it('should throw an error if the token is invalid', () => {
+        const req = {
+            get: () => {
+                return 'Berear xws'
+            }
+        };
+        expect(authMiddleware.bind(this, req, {}, () => {})).to.throw();
+    });
+
+    it('should have an userId if the user is authenticated', () => {
+        const req = {
+            get: () => {
+                return 'Berear xws'
+            }
+        };
+
+        // Mock Verify function
+        sinon.stub(jwt, 'verify');
+        jwt.verify.returns({ id: 'abc' });
+
+        authMiddleware(req, {}, () => {});
+        
+        expect(jwt.verify.called).to.be.true;
+        expect(req).to.have.property('userId');
+        expect(req).to.have.property('userId', 'abc');
+
+        jwt.verify.restore();
     });
 });
