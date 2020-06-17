@@ -1,8 +1,8 @@
-// Test
+// Tests
 const { expect } = require('chai');
+const sinon = require('sinon');
 // Packages
 const jwt = require('jsonwebtoken');
-const sinon = require('sinon');
 
 // Middleware Component
 const authMiddleware = require('../middleware/is-auth');
@@ -47,7 +47,7 @@ describe('Auth Middleware', () => {
         jwt.verify.returns({ id: 'abc' });
 
         authMiddleware(req, {}, () => {});
-        
+
         expect(jwt.verify.called).to.be.true;
         expect(req).to.have.property('userId');
         expect(req).to.have.property('userId', 'abc');
