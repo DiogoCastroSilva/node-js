@@ -70,8 +70,8 @@ class Feed extends Component {
 
     const graphqlQuery = {
       query: `
-          {
-            posts(page: ${page}) {
+          query FetchPosts($page: Int) {
+            posts(page: $page) {
               posts {
                 _id
                 title
@@ -85,7 +85,10 @@ class Feed extends Component {
               totalPosts
             }
           }
-      `
+      `,
+      variables: {
+        page: page
+      }
     };
     fetch('http://localhost:8080/graphql', {
       method: 'POST',
@@ -121,12 +124,15 @@ class Feed extends Component {
     event.preventDefault();
     const graphqlQuery = {
       query: `
-        mutation {
-          updateStatus(status: "${this.state.status}") {
+        mutation UpdateStatus($status: String){
+          updateStatus(status: $status) {
             status
           }
         }
-      `
+      `,
+      variables: {
+        status: this.state.status
+      }
     };
 
     fetch('http://localhost:8080/graphql', {
@@ -189,15 +195,15 @@ class Feed extends Component {
     })
     .then(res => res.json())
     .then(fileResData => {
-      const imageUrl = fileResData.filePath;
+      const imageUrl = fileResData.filePath || 'undefined';
 
       let graphqlQuery = {
         query: `
-          mutation {
+          mutation createPost($title: String!, $content: String!, $imageUrl: String!) {
             createPost(postInput: {
-              title: "${postData.title}",
-              content: "${postData.content}",
-              imageUrl: "${imageUrl}"
+              title: $title,
+              content: $content,
+              imageUrl: $imageUrl
             }) {
               _id
               title
@@ -209,7 +215,12 @@ class Feed extends Component {
               createdAt
             }
           }
-        `
+        `,
+        variables: {
+          title: postData.title,
+          content: postData.content,
+          imageUrl: imageUrl
+        }
       };
 
       if (this.state.editPost) {
