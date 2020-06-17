@@ -9,15 +9,14 @@ const multer = require('multer');
 const helmet = require('helmet');
 const compression = require('compression');
 const morgan = require('morgan');
+const mongoose = require('mongoose');
 // Session
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const csrf = require('csurf');
 const flash = require('connect-flash');
 
-const MONGODB_URI = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0-fnsz5.mongodb.net/${process.env.MONGO_DB}?retryWrites=true&w=majority`;
-// Mongoose
-const mongoose = require('mongoose');
+const MONGODB_URI = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0-fnsz5.mongodb.net/${process.env.MONGO_DB}`;
 
 // Routes
 const adminRoutes = require('./routes/admin');
