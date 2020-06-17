@@ -1,15 +1,18 @@
 // Core
 const path = require('path');
 const express = require('express');
+// Packages
 const bodyParser = require('body-parser');
 const multer = require('multer');
+const helmet = require('helmet');
+const compression = require('compression');
 // Session
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const csrf = require('csurf');
 const flash = require('connect-flash');
 
-const MONGODB_URI = 'MONGO_DB_LINK';
+const MONGODB_URI = `'mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0-fnsz5.mongodb.net/${process.env.MONGO_DB}?retryWrites=true&w=majority'`;
 // Mongoose
 const mongoose = require('mongoose');
 
@@ -60,6 +63,8 @@ app.set('view engine', 'pug');
 app.set('views', 'views');
 
 // Config
+app.use(helmet());
+app.use(compression());
 // Works only with text values
 app.use(bodyParser.urlencoded({ extended: false }));
 // Works with files - And looks for the input with id image
@@ -118,7 +123,7 @@ app.use((error, req, res, next) => {
 mongoose
     .connect(MONGODB_URI)
     .then(() => {   
-        app.listen(3000);
+        app.listen(process.env.PORT || 3000);
     }).catch(e => {
         throw new Error('Erro connecting to server', e);
     });
