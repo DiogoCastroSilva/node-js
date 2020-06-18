@@ -107,7 +107,6 @@ app.use((error, req, res, next) => {
   res.status(status).json({ message: message, data: data });
 });
 
-console.log('url', MONGODB_URI);
 mongoose
   .connect(
     MONGODB_URI
